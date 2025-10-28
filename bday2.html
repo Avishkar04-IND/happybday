@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Bhumika!</title> <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Page 3 Font Styles --- */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-fancy {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* 3. Custom CSS for animations */
+        #fireworksCanvas { pointer-events: none; }
+        
+        /* --- Page 1: Photo Scroller (Vertical & Horizontal) --- */
+        .scroller {
+            overflow: hidden;
+        }
+        .scroller-inner {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        /* Vertical (Desktop) Scrollers */
+        .scroller[data-direction="down"],
+        .scroller[data-direction="up"] {
+            height: 100vh;
+            -webkit-mask: linear-gradient(180deg, transparent, white 15%, white 85%, transparent);
+            mask: linear-gradient(180deg, transparent, white 15%, white 85%, transparent);
+        }
+        .scroller[data-direction="down"] .scroller-inner {
+            flex-direction: column;
+            animation: scroll-down 60s linear infinite;
+        }
+        .scroller[data-direction="up"] .scroller-inner {
+            flex-direction: column;
+            animation: scroll-up 60s linear infinite;
+        }
+        .scroller[data-direction="down"] .scroller-inner img,
+        .scroller[data-direction="up"] .scroller-inner img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Horizontal (Mobile) Scrollers */
+        .scroller[data-direction="left"],
+        .scroller[data-direction="right"] {
+            -webkit-mask: linear-gradient(90deg, transparent, white 10%, white 90%, transparent);
+            mask: linear-gradient(90deg, transparent, white 10%, white 90%, transparent);
+        }
+        .scroller[data-direction="left"] .scroller-inner {
+            flex-direction: row;
+            width: max-content;
+            animation: scroll-left 60s linear infinite;
+        }
+        .scroller[data-direction="right"] .scroller-inner {
+            flex-direction: row;
+            width: max-content;
+            animation: scroll-right 60s linear infinite;
+        }
+        .scroller[data-direction="left"] .scroller-inner img,
+        .scroller[data-direction="right"] .scroller-inner img {
+            width: auto;
+            height: 150px; /* Good mobile height */
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        @keyframes scroll-down {
+            from { transform: translateY(-50%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes scroll-up {
+            from { transform: translateY(0); }
+            to { transform: translateY(-50%); }
+        }
+        @keyframes scroll-left {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        @keyframes scroll-right {
+            from { transform: translateX(-50%); }
+            to { transform: translateX(0); }
+        }
+
+        /* --- Page 1: Fireworks Container --- */
+        .fireworks-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* --- Page 1: Floating Items --- */
+        .floating-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .floating-item {
+            position: absolute;
+            animation: float-up 20s linear infinite;
+            opacity: 0;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        @keyframes float-up {
+            0% {
+                bottom: -150px;
+                transform: translateX(0) rotate(0deg);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateX(20px) rotate(180deg);
+            }
+            100% {
+                bottom: 100vh;
+                transform: translateX(-20px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* --- Page 3: New Envelope CSS --- */
+        .card-container {
+             perspective: 1000px;
+             cursor: pointer;
+             /* Add transition for the container's own movement */
+              transition: transform 0.7s 0.1s ease-in-out;
+         }
+         /* When open, move the whole container down to compensate */
+         /* Applied via JS toggle, targets the container itself */
+         .card-container.open {
+              transform: translateY(60px); /* Adjust as needed */
+          }
+         .envelope {
+             position: relative;
+             width: 300px;
+             height: 200px;
+             transform-style: preserve-3d;
+             transition: all 0.7s ease-in-out;
+         }
+         .letter {
+             position: absolute;
+             bottom: 0;
+             left: 5%;
+             width: 90%;
+             height: 95%; /* Initial height */
+             background: #fff;
+             border-radius: 8px;
+             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+             z-index: 10;
+             transition: all 0.7s 0.1s ease-out; /* 0.1s delay */
+             transform-origin: bottom;
+             overflow-y: auto; 
+         }
+         .envelope-body {
+             position: absolute;
+             bottom: 0;
+             width: 100%;
+             height: 100%;
+             background: #f472b6; /* pink-500 */
+             border-radius: 8px;
+             z-index: 5;
+         }
+         .flap {
+             position: absolute;
+             top: 0;
+             width: 100%;
+             height: 52%; /* Slightly more than half */
+             background: #ec4899; /* pink-600 */
+             clip-path: polygon(0 0, 100% 0, 50% 100%);
+             z-index: 15;
+             transform-origin: bottom;
+             transition: all 0.7s ease-in-out;
+             transform: rotateX(0deg);
+         }
+         .seal {
+             position: absolute;
+             top: 40%;
+             left: 50%;
+             width: 40px;
+             height: 40px;
+             background: #fbbf24; /* amber-400 */
+             border-radius: 50%;
+             z-index: 20;
+             transform: translate(-50%, -50%);
+             transition: all 0.5s ease-out;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+         }
+         .seal-icon {
+             font-size: 20px;
+             font-weight: bold; /* Make initial bold */
+             color: #b45309; /* amber-700 */
+         }
+         /* --- Page 3 OPEN STATE STYLES --- */
+         .card-container.open .flap { /* Target flap inside open container */
+             transform: rotateX(180deg);
+             z-index: 6;
+         }
+         .card-container.open .letter { /* Target letter inside open container */
+             transform: translateY(-120px);
+             z-index: 25;
+             height: 320px; /* Expand height */
+         }
+         .card-container.open .seal { /* Target seal inside open container */
+             opacity: 0;
+             transform: translate(-50%, -50%) scale(0.5);
+         }
+        /* --- End of Page 3 CSS --- */
+
+
+        /* Hide scrollbar for letter */
+        .letter::-webkit-scrollbar { display: none; }
+        .letter { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* General text shadow for better readability on backgrounds */
+        .text-shadow-lg {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        .text-shadow {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Center content within the flex container */
+        .page-content-wrapper {
+            position: relative;
+            z-index: 10; /* Above fireworks */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 1rem; /* Base padding */
+            box-sizing: border-box;
+        }
+
+        /* Confetti Burst Animation (CSS-based) */
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1; /* Behind content */
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--confetti-color);
+            opacity: 0;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+        @keyframes confetti-fall {
+            0% {
+                transform: translate(var(--initial-x), var(--initial-y)) rotate(0deg) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--final-x), var(--final-y)) rotate(var(--final-rotation)) scale(1);
+                opacity: 0;
+            }
+        }
+        
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <div id="page1" class="relative min-h-screen w-full bg-gradient-to-br from-[#f49541] via-[#dd5d97] to-[#ad2167] text-white flex flex-col">
+        
+        <div class="floating-container">
+            <div class="floating-item" style="left: 10%; animation-delay: 0s; font-size: 3rem;">🎂</div>
+            <div class="floating-item" style="left: 20%; animation-delay: 5s; font-size: 2rem;">🎉</div>
+            <div class="floating-item" style="left: 30%; animation-delay: 12s; font-size: 2.5rem;">🎂</div>
+            <div class="floating-item" style="left: 40%; animation-delay: 8s; font-size: 2rem;">🎉</div>
+            <div class="floating-item" style="left: 50%; animation-delay: 15s; font-size: 3rem;">🎂</div>
+            <div class="floating-item" style="left: 60%; animation-delay: 10s; font-size: 2.5rem;">🎉</div>
+            <div class="floating-item" style="left: 70%; animation-delay: 3s; font-size: 2rem;">🎂</div>
+            <div class="floating-item" style="left: 80%; animation-delay: 7s; font-size: 3rem;">🎉</div>
+            <div class="floating-item" style="left: 90%; animation-delay: 18s; font-size: 2.5rem;">🎂</div>
+        </div>
+        <div class="fireworks-container">
+            <canvas id="fireworksCanvas" class="w-full h-full block"></canvas>
+        </div>
+
+        <div class="scroller absolute top-0 left-0 hidden md:block md:w-[250px] lg:w-[300px] z-[5]" data-direction="down">
+            <div class="scroller-inner">
+                <img src="photo1.jpg" alt="Memory 1">
+                <img src="photo2.jpg" alt="Memory 2">
+                <img src="photo3.jpg" alt="Memory 3">
+                <img src="photo4.jpg" alt="Memory 4">
+                <img src="photo5.jpg" alt="Memory 5">
+                <img src="photo1.jpg" aria-hidden="true">
+                <img src="photo2.jpg" aria-hidden="true">
+                <img src="photo3.jpg" aria-hidden="true">
+                <img src="photo4.jpg" aria-hidden="true">
+                <img src="photo5.jpg" aria-hidden="true">
+            </div>
+        </div>
+
+        <div class="scroller absolute top-0 right-0 hidden md:block md:w-[250px] lg:w-[300px] z-[5]" data-direction="up">
+            <div class="scroller-inner">
+                <img src="photo6.jpg" alt="Memory 6">
+                <img src="photo8.jpg" alt="Memory 8"> <img src="photo7.jpg" alt="Memory 7"> <img src="photo9.jpg" alt="Memory 9">
+                <img src="photo10.jpg" alt="Memory 10">
+                <img src="photo6.jpg" aria-hidden="true">
+                <img src="photo8.jpg" aria-hidden="true"> <img src="photo7.jpg" aria-hidden="true"> <img src="photo9.jpg" aria-hidden="true">
+                <img src="photo10.jpg" aria-hidden="true">
+            </div>
+        </div>
+
+        <div class="page-content-wrapper px-4 md:pl-[270px] md:pr-[270px] lg:pl-[320px] lg:pr-[320px] min-h-[75vh] md:min-h-screen">
+            
+            <div id="birthdayCardContent" class="relative z-20 w-full max-w-xl flex flex-col items-center justify-center p-6 bg-white bg-opacity-15 rounded-3xl shadow-2xl border border-white border-opacity-30 backdrop-blur-lg transform hover:scale-[1.01] transition-all duration-300 overflow-hidden
+                    before:absolute before:inset-0 before:rounded-3xl before:p-0.5 before:bg-gradient-to-br before:from-white before:via-white/70 before:to-transparent before:z[-1] before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-500
+                    after:absolute after:inset-0 after:rounded-3xl after:shadow-[0_0_20px_rgba(255,255,255,0.5),_inset_0_0_10px_rgba(255,255,255,0.3)]">
+                
+                <div class="confetti-container" id="confettiContainer"></div>
+
+                <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold text-center text-white text-shadow-lg mb-4 leading-tight">
+                    Happy Birthday, <br class="sm:hidden">Bhumika! </h1>
+                
+                <p class="text-lg sm:text-xl md:text-2xl text-center max-w-3xl mb-8 text-white text-shadow font-semibold">
+                    I'm so incredibly lucky to have you in my life. You make every day brighter!
+                    Wishing you the happiest of birthdays and a year filled with love, laughter, and full of blessings. </p>
+            </div>
+            <button onclick="showPage('page2')" class="mt-4 px-8 py-4 bg-white text-[#ad2167] font-bold text-lg rounded-full shadow-2xl transform hover:scale-105 transition-transform duration-300 animate-bounce-slow">
+                I made something special for you...
+            </button>
+        </div>
+
+        <div class="w-full block md:hidden py-4 space-y-4">
+            
+            <div class="scroller" data-direction="left">
+                <div class="scroller-inner">
+                    <img src="photo1.jpg" alt="Memory 1">
+                    <img src="photo2.jpg" alt="Memory 2">
+                    <img src="photo3.jpg" alt="Memory 3">
+                    <img src="photo4.jpg" alt="Memory 4">
+                    <img src="photo5.jpg" alt="Memory 5">
+                    <img src="photo6.jpg" alt="Memory 6">
+                    <img src="photo7.jpg" alt="Memory 7">
+                    <img src="photo8.jpg" alt="Memory 8">
+                    <img src="photo9.jpg" alt="Memory 9">
+                    <img src="photo10.jpg" alt="Memory 10">
+                    <img src="photo1.jpg" aria-hidden="true">
+                    <img src="photo2.jpg" aria-hidden="true">
+                    <img src="photo3.jpg" aria-hidden="true">
+                    <img src="photo4.jpg" aria-hidden="true">
+                    <img src="photo5.jpg" aria-hidden="true">
+                    <img src="photo6.jpg" aria-hidden="true">
+                    <img src="photo7.jpg" aria-hidden="true">
+                    <img src="photo8.jpg" aria-hidden="true">
+                    <img src="photo9.jpg" aria-hidden="true">
+                    <img src="photo10.jpg" aria-hidden="true">
+                </div>
+            </div>
+
+            <div class="scroller" data-direction="right">
+                <div class="scroller-inner">
+                     <img src="photo1.jpg" alt="Memory 1">
+                     <img src="photo2.jpg" alt="Memory 2">
+                     <img src="photo3.jpg" alt="Memory 3">
+                     <img src="photo4.jpg" alt="Memory 4">
+                     <img src="photo5.jpg" alt="Memory 5">
+                     <img src="photo6.jpg" alt="Memory 6">
+                     <img src="photo7.jpg" alt="Memory 7">
+                     <img src="photo8.jpg" alt="Memory 8">
+                     <img src="photo9.jpg" alt="Memory 9">
+                     <img src="photo10.jpg" alt="Memory 10">
+                    <img src="photo1.jpg" aria-hidden="true">
+                     <img src="photo2.jpg" aria-hidden="true">
+                     <img src="photo3.jpg" aria-hidden="true">
+                     <img src="photo4.jpg" aria-hidden="true">
+                     <img src="photo5.jpg" aria-hidden="true">
+                     <img src="photo6.jpg" aria-hidden="true">
+                     <img src="photo7.jpg" aria-hidden="true">
+                     <img src="photo8.jpg" aria-hidden="true">
+                     <img src="photo9.jpg" aria-hidden="true">
+                     <img src="photo10.jpg" aria-hidden="true">
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <div id="page2" class="min-h-screen w-full flex flex-col items-center justify-center p-8 bg-rose-50 text-gray-800 hidden relative overflow-hidden">
+        
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-rose-800 mb-6">
+            A Few Reasons Why You're Awesome
+        </h2>
+        <p class="text-lg sm:text-xl text-center text-rose-600 mb-12">
+            Click on the hearts to see some of our best memories!
+        </p>
+
+        <div class="relative">
+            <svg class="w-64 sm:w-80 h-auto" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 30 C 10 10, 90 10, 90 30 L 90 110 C 90 120, 10 120, 10 110 L 10 30 Z" fill="#cffafe" fill-opacity="0.6" stroke="#0891b2" stroke-width="2"/>
+                <path d="M8 30 L 92 30" stroke="#0891b2" stroke-width="4" stroke-linecap="round"/>
+                <path d="M20 15 L 80 15 C 85 15, 85 25, 80 25 L 20 25 C 15 25, 15 15, 20 15 Z" fill="#0e7490" stroke="#0891b2" stroke-width="2"/>
+                <text x="50" y="75" font-family="Arial, sans-serif" font-size="10" fill="#0e7490" text-anchor="middle" font-weight="bold">Memory Jar</text>
+            </svg>
+
+            <div class="absolute cursor-pointer transform hover:scale-125 transition-transform" style="top: 10%; left: -10%;" onclick="openModal(0)">
+                <svg class="w-12 h-12 text-pink-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+            </div>
+            <div class="absolute cursor-pointer transform hover:scale-125 transition-transform" style="top: -10%; left: 30%;" onclick="openModal(1)">
+                <svg class="w-10 h-10 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+            </div>
+            <div class="absolute cursor-pointer transform hover:scale-125 transition-transform" style="top: 0%; left: 80%;" onclick="openModal(2)">
+                <svg class="w-14 h-14 text-purple-500 animate-pulse" style="animation-duration: 2s;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+            </div>
+            <div class="absolute cursor-pointer transform hover:scale-125 transition-transform" style="top: 40%; left: -20%;" onclick="openModal(3)">
+                <svg class="w-10 h-10 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
+            </div>
+        </div>
+
+        <div class="mt-16 flex gap-4">
+            <button onclick="showPage('page1')" class="px-6 py-3 bg-white text-rose-600 font-bold rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300 border-2 border-rose-200">
+                &larr; Go Back
+            </button>
+            <button onclick="showPage('page3')" class="px-6 py-3 bg-rose-600 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300">
+                One last thing... &rarr;
+            </button>
+        </div>
+    </div>
+
+    <div id="page3" class="min-h-screen w-full flex flex-col items-center justify-center p-8 bg-gradient-to-r from-rose-100 to-teal-100 hidden">
+         <h2 class="text-3xl sm:text-4xl font-fancy text-center text-pink-600 mb-8">
+             A msg for you </h2>
+
+        <div id="birthday-card" class="card-container"> <div class="envelope">
+                
+                <div class="letter p-6 text-gray-800">
+                    <div class="text-center mb-4">
+                        <h2 class="font-fancy text-3xl text-pink-600">
+                           Hey Bhumi, </h2>
+                    </div>
+                    
+                    <p class="text-sm mb-3">
+                        Happy birthday to my best friend.
+                    </p>
+                    <p class="text-sm mb-3">
+                        Pata hai, October mere liye ek fav month ban chuka hai. Vese mere saare month fav hai but October is something special kyu ki the best friendship I got is yours, which is on 14th Oct, and the best person in my life came from October too... ya, that's you.
+                    </p>
+                    <p class="text-sm mb-3">
+                        From the time of being a classmate to the bestest friend I've ever had is so stunning. You are not like my previous friends... you gave me the last hope that, yes! God watches you and has the best for you.
+                    </p>
+                    <p class="text-sm mb-3">
+                        Thank you for being in my life, supporting me, and understanding me. If I had another 100 lives, I think I would choose to be your friend every single time, as these are the happiest years of my life. I know you have many important people in your life, but making me a small part between them is lightning.
+                    </p>
+                    <p class="text-sm mb-3">
+                        It’s hard to put into words how important you are to me. I am so deeply grateful that you're in my life.
+                    </p>
+                     <p class="text-sm mb-3">
+                        Thank you for being the incredible person you are, for our connection, and for the way I can always count on you. You are truly one of the best people I know, and my life is so much better for having you in it.
+                    </p>
+                    <p class="text-sm mb-3">
+                       I hope you have a wonderful day. I want you to always remember my promise: I will be there for you, no matter what. Through any high or low, in any situation, you will never have to face anything alone. I'll always be in your corner.
+                    </p>
+
+                    <p class="text-sm font-semibold text-right mt-4">
+                        With all my gratitude,<br>... </p>
+                    </div>
+
+                <div class="envelope-body"></div>
+                <div class="flap"></div>
+                <div class="seal" title="Click to open">
+                    <span class="seal-icon">B</span> </div>
+            </div>
+        </div>
+
+        <button onclick="showPage('page1')" class="mt-24 px-6 py-3 bg-purple-600 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-transform duration-300"> Start Over
+        </button>
+    </div>
+
+
+    <div id="memoryModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden" onclick="closeModal()">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Remember when...</h3>
+            <img id="memorySticker" src="" alt="Memory Sticker" class="w-32 h-32 mx-auto mb-4 object-contain">
+            <p id="memoryText" class="text-gray-700 text-lg text-center"></p>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Memories Data ---
+        const memories = [
+            { text: "We stayed up all night talking and sharing? That's one of my favorite memories.", sticker: "https://i.pinimg.com/originals/a8/7c/cd/a87ccdcc341091129dd3be133c978ca0.gif" },
+            { text: "That time we laughed so hard we couldn't breathe? My stomach hurt for days!", sticker: "https://i.pinimg.com/originals/f0/dc/0c/f0dc0c5f0e1ffbc04d4ab8b512fefacd.gif" },
+            { text: "You were there for me when I was going through a tough time. I'll never forget that. You're the best.", sticker: "https://media1.tenor.com/m/8moogVqRHIAAAAAd/minions-get-well-soon.gif" },
+            { text: "I'm just so grateful to have a friend as kind, funny, and amazing as you. Happy birthday!", sticker: "https://media.tenor.com/6LGA0vNwrVIAAAAM/everyday-feeling-blessed.gif" }
+        ];
+
+        // --- Page Navigation ---
+        let currentFireworksInterval = null;
+        let currentFireworksParticles = [];
+        const fireworksCanvas = document.getElementById('fireworksCanvas'); // Get canvas once
+        let ctx = fireworksCanvas ? fireworksCanvas.getContext('2d') : null; // Get context once
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('page3').classList.add('hidden');
+
+            // Clear fireworks when navigating away from page1
+            if (currentFireworksInterval) {
+                clearInterval(currentFireworksInterval);
+                currentFireworksInterval = null;
+            }
+            if (fireworksCanvas && ctx) { // Use existing ctx
+                ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+                currentFireworksParticles = [];
+                particles = []; // Also clear the main particles array
+            }
+
+
+            // Show the requested page
+            const page = document.getElementById(pageId);
+            if (page) {
+                page.classList.remove('hidden');
+                // Start fireworks only if on page1
+                if (pageId === 'page1') {
+                    startFireworks(); 
+                    const confettiContainer = document.getElementById('confettiContainer'); 
+                    if(confettiContainer) setTimeout(() => createConfettiBurst(confettiContainer), 500); 
+                }
+                // Reset envelope on page3 if shown
+                if (pageId === 'page3') {
+                    const card = document.getElementById('birthday-card'); // Correct ID for the envelope container
+                    if (card) card.classList.remove('open'); // Remove 'open' class when showing page 3
+                }
+            }
+        }
+
+        // --- Page 2 Modal ---
+        const modal = document.getElementById('memoryModal');
+        const memoryText = document.getElementById('memoryText');
+        const memorySticker = document.getElementById('memorySticker');
+        
+        function openModal(index) {
+            if (memories[index]) {
+                const memory = memories[index];
+                memoryText.textContent = memory.text;
+                memorySticker.src = memory.sticker;
+                modal.classList.remove('hidden');
+            }
+        }
+        function closeModal() {
+            modal.classList.add('hidden');
+            memorySticker.src = "";
+        }
+        
+        // --- Page 1 Seamless Scroller Logic ---
+        function setupScrollers() {
+             document.querySelectorAll(".scroller").forEach(scroller => {
+                const scrollerInner = scroller.querySelector(".scroller-inner");
+                if(!scrollerInner) return; 
+                const scrollerContent = Array.from(scrollerInner.children).filter(el => !el.hasAttribute('aria-hidden')); // Get only original items
+                
+                // Clear existing duplicates first to prevent infinite growth on re-run
+                scrollerInner.querySelectorAll('[aria-hidden="true"]').forEach(dup => dup.remove());
+
+                if (scrollerContent.length > 0) { 
+                     scrollerContent.forEach(item => {
+                        const duplicatedItem = item.cloneNode(true);
+                        duplicatedItem.setAttribute("aria-hidden", true);
+                        scrollerInner.appendChild(duplicatedItem);
+                    });
+                }
+            });
+        }
+
+        // --- Page 1 Fireworks Logic ---
+        let particles = [];
+        const fireworksColors = ['#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845', '#33FF57', '#3357FF', '#FF33F5'];
+
+        function resizeCanvas() {
+            if (!fireworksCanvas) return; 
+            fireworksCanvas.width = window.innerWidth;
+            fireworksCanvas.height = window.innerHeight;
+        }
+
+        class Particle { 
+            constructor(x, y, color, speedX, speedY, lifespan, isTrail = false) {
+                this.x = x; this.y = y; this.color = color; this.speedX = speedX; this.speedY = speedY;
+                this.lifespan = lifespan; this.creationTime = Date.now(); this.radius = isTrail ? 1 : 2;
+                this.alpha = 1; this.gravity = 0.05; this.friction = 0.99;
+            }
+            update() {
+                const elapsed = Date.now() - this.creationTime; this.alpha = 1 - (elapsed / this.lifespan);
+                if (this.alpha <= 0) return false;
+                this.speedY += this.gravity; this.speedX *= this.friction; this.speedY *= this.friction;
+                this.x += this.speedX; this.y += this.speedY; return true;
+            }
+            draw() {
+                if (!ctx) return; 
+                ctx.save(); ctx.globalAlpha = this.alpha; ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = this.color; ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createFirework(x, y) {
+             const baseColor = fireworksColors[Math.floor(Math.random() * fireworksColors.length)];
+             const particleCount = 50 + Math.random() * 100;
+             for (let i = 0; i < particleCount; i++) {
+                 const angle = Math.random() * Math.PI * 2; const speed = Math.random() * 5 + 1;
+                 const speedX = Math.cos(angle) * speed; const speedY = Math.sin(angle) * speed;
+                 const lifespan = 1000 + Math.random() * 1000;
+                 particles.push(new Particle(x, y, baseColor, speedX, speedY, lifespan));
+             }
+        }
+
+        function animateFireworks() { 
+            if (!ctx || !fireworksCanvas) return;
+            ctx.clearRect(0, 0, fireworksCanvas.width, fireworksCanvas.height);
+            // Use filter directly on particles and update currentFireworksParticles
+            currentFireworksParticles = particles.filter(particle => particle.update()); 
+            currentFireworksParticles.forEach(particle => particle.draw());
+            particles = currentFireworksParticles; // Update the main particles array
+            requestAnimationFrame(animateFireworks);
+        }
+        
+        function startFireworks() { 
+            if (currentFireworksInterval || !fireworksCanvas) return; 
+            if(!ctx) ctx = fireworksCanvas.getContext('2d'); 
+            if(!ctx) return; 
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas); // Add resize listener only when starting
+            createFirework(fireworksCanvas.width / 2, fireworksCanvas.height / 2);
+            currentFireworksInterval = setInterval(() => {
+                const x = Math.random() * fireworksCanvas.width * 0.8 + fireworksCanvas.width * 0.1;
+                const y = Math.random() * fireworksCanvas.height * 0.6 + fireworksCanvas.height * 0.1;
+                createFirework(x, y);
+            }, 1000);
+            animateFireworks();
+        }
+
+        // --- Confetti Burst Logic ---
+        const confettiColors = ['#fde68a', '#f9a8d4', '#a78bfa', '#6ee7b7', '#fcd34d', '#fb923c'];
+        function createConfettiPiece(container) {
+             if (!container) return; 
+             const piece = document.createElement('div'); piece.classList.add('confetti-piece');
+             const startX = Math.random() * 100 + '%'; const startY = Math.random() * 100 + '%';
+             const finalX = (Math.random() - 0.5) * 400 + 'px'; const finalY = (Math.random() * 200 + 100) + 'px';
+             const finalRotation = Math.random() * 720 + 'deg';
+             piece.style.setProperty('--confetti-color', confettiColors[Math.floor(Math.random() * confettiColors.length)]);
+             piece.style.setProperty('--initial-x', startX); piece.style.setProperty('--initial-y', startY);
+             piece.style.setProperty('--final-x', finalX); piece.style.setProperty('--final-y', finalY);
+             piece.style.setProperty('--final-rotation', finalRotation);
+             piece.style.animationDelay = (Math.random() * 0.5) + 's'; piece.style.animationDuration = (2 + Math.random() * 1) + 's';
+             container.appendChild(piece);
+             piece.addEventListener('animationend', () => { piece.remove(); });
+        }
+        function createConfettiBurst(container, count = 50) {
+             if (!container) return; 
+             for (let i = 0; i < count; i++) { createConfettiPiece(container); }
+        }
+
+        // --- Initial Setup ---
+        // *** Consolidated DOMContentLoaded Listener ***
+        document.addEventListener('DOMContentLoaded', () => {
+             // Setup scrollers (including duplication logic)
+             setupScrollers();
+
+             // Setup envelope listener
+             const cardElement = document.getElementById('birthday-card'); 
+             if (cardElement) {
+                 cardElement.addEventListener('click', () => {
+                     // Check if the click target is the card itself or inside it, but not the button
+                     cardElement.classList.toggle('open');
+                 });
+             }
+            
+             // Show the initial page
+             showPage('page1'); 
+         });
+
+    </script>
+
+</body>
+</html>
+
+</body>
+</html>
